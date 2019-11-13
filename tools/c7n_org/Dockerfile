@@ -33,9 +33,13 @@ RUN apt-get --yes update && apt-get --yes upgrade \
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
  && az extension add --name azure-devops
 
-USER custodian
+# Containers used in Azure Pipelines need to run as root, 
+# so we cannot switch users here.
+# USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/home/custodian"]
-ENTRYPOINT ["/bin/bash"]
 
+# Containers used in Azure Pipelines should not have an entry point
+# ENTRYPOINT ["/usr/local/bin/c7n-org"]
+# CMD ["--help"]

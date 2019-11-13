@@ -16,9 +16,8 @@ ADD tools /src/tools/
 WORKDIR /src
 RUN adduser --disabled-login custodian
 RUN apt-get --yes update && apt-get --yes upgrade \
- && apt-get --yes install build-essential \
+ && apt-get --yes install build-essential curl jq nano \
  && pip3 install -r requirements.txt  . \
- && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
  && pip3 install tools/c7n_org \
  && apt-get --yes remove build-essential \
@@ -29,11 +28,14 @@ RUN apt-get --yes update && apt-get --yes upgrade \
  && rm -Rf /root/.cache/ \
  && mkdir /output \
  && chown custodian: /output
+ 
+# Install Azure CLI
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
+ && az extension add --name azure-devops
 
 USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/home/custodian"]
-ENTRYPOINT ["/usr/local/bin/c7n-org"]
-CMD ["--help"]
+ENTRYPOINT ["/bin/bash"]
 
